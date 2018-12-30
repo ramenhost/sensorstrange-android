@@ -3,4 +3,7 @@
     <string name="title_home">Key Log</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="start">Start Sensor Logging</string>
+    <string name="stop">Stop Sensor Logging</string>
+    <string name="message">Click here to start typing.</string>
 </resources>

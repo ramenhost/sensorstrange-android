@@ -1,6 +1,7 @@
-package io.picopalette.sensorstrange;
+package io.picopalette.sensorstrange.views;
 
 import android.content.Context;
+import android.os.SystemClock;
 import android.support.v7.widget.AppCompatTextView;
 import android.text.InputType;
 import android.util.AttributeSet;
@@ -13,9 +14,14 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 
+import io.picopalette.sensorstrange.helpers.Logger;
+
 public class KeyLogTextView extends AppCompatTextView {
 
     private static final String TAG = "KeyLog";
+    private InputMethodManager imm;
+    private static final float NS2MS = 1.0f / 1000000.0f;
+    private Logger kLogger;
 
     public KeyLogTextView(Context context) {
         super(context);
@@ -31,23 +37,29 @@ public class KeyLogTextView extends AppCompatTextView {
         super(context, attrs, defStyleAttr);
         setKeyListener();
     }
-    
+
+    public void setLogger(Logger logger) {
+        this.kLogger = logger;
+    }
+
     private void setKeyListener() {
-        setFocusableInTouchMode(true); // allows the keyboard to pop up on
-        // touch down
+        setFocusableInTouchMode(true);
 
         setOnKeyListener(new OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
+                String log = "";
                 if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
                     return false;
                 }
                 else if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                    // Perform action on key press
-                    Log.d(TAG, "ACTION_DOWN " + event.getDisplayLabel());
-                    return true;
+                    log = (long)(SystemClock.elapsedRealtimeNanos()*NS2MS) + "," + "ACTION_DOWN," + event.getDisplayLabel();
+                    //Log.d(TAG,  log);
                 } else if (event.getAction() == KeyEvent.ACTION_UP) {
-                    // Perform action on key press
-                    Log.d(TAG, "ACTION_UP " + event.getDisplayLabel());
+                    log = (long)(SystemClock.elapsedRealtimeNanos()*NS2MS) + "," + "ACTION_UP," + event.getDisplayLabel();
+                    //Log.d(TAG, log);
+                }
+                if(kLogger != null && !log.matches("")) {
+                    kLogger.appendLog(log);
                     return true;
                 }
                 return false;
@@ -58,11 +70,9 @@ public class KeyLogTextView extends AppCompatTextView {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         super.onTouchEvent(event);
-        Log.d(TAG, "onTOUCH");
         if (event.getAction() == MotionEvent.ACTION_UP) {
-
             // show the keyboard so we can enter text
-            InputMethodManager imm = (InputMethodManager) getContext()
+            imm = (InputMethodManager) getContext()
                     .getSystemService(Context.INPUT_METHOD_SERVICE);
             if (imm != null) {
                 imm.showSoftInput(this, InputMethodManager.SHOW_FORCED);
@@ -71,10 +81,14 @@ public class KeyLogTextView extends AppCompatTextView {
         return true;
     }
 
+    public void hideKeyboard() {
+        if(imm != null) {
+            imm.hideSoftInputFromWindow(getWindowToken(), 0);
+        }
+    }
+
     @Override
     public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
-        Log.d(TAG, "onCreateInputConnection");
-
         BaseInputConnection fic = new BaseInputConnection(this, false);
         outAttrs.actionLabel = null;
         outAttrs.inputType = InputType.TYPE_NULL;
