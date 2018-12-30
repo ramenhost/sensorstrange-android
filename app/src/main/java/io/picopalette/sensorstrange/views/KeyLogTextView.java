@@ -13,11 +13,17 @@ import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import io.picopalette.sensorstrange.helpers.Logger;
 
 public class KeyLogTextView extends AppCompatTextView {
 
+
+    private String[] words={"HELLO","FANTASTIC","CAPTAIN","BATMAN","CYBER","CACHE","WELCOME"};
+    private int currentWord=-1;
+    private int charCount;
+    private int wordCount;
     private static final String TAG = "KeyLog";
     private InputMethodManager imm;
     private static final float NS2MS = 1.0f / 1000000.0f;
@@ -38,9 +44,15 @@ public class KeyLogTextView extends AppCompatTextView {
         setKeyListener();
     }
 
-    public void setLogger(Logger logger) {
+    public void setLogger(Logger logger)
+    {
         this.kLogger = logger;
-    }
+        charCount=0;
+        wordCount=0;
+        currentWord++;
+
+        setText(words[currentWord]);
+    } // session starts here
 
     private void setKeyListener() {
         setFocusableInTouchMode(true);
@@ -52,10 +64,33 @@ public class KeyLogTextView extends AppCompatTextView {
                     return false;
                 }
                 else if (event.getAction() == KeyEvent.ACTION_DOWN) {
+
                     log = (long)(SystemClock.elapsedRealtimeNanos()*NS2MS) + "," + "ACTION_DOWN," + event.getDisplayLabel();
+
+                    if(words[currentWord].charAt(charCount)==event.getDisplayLabel()){
+                        charCount++;
+                        if(charCount==words[currentWord].length()){
+                            wordCount++;
+                            charCount=0;
+                            setText(words[currentWord]+" "+wordCount);
+                            if(wordCount==50){
+                                wordCount=0;
+                                currentWord++;
+                                if(currentWord==words.length){
+                                    setText("Words Completed - Stop Logging");
+                                }else {
+                                    setText(words[currentWord]);
+                                }
+                            }
+                        }
+                    }else{
+                        Toast.makeText(getContext(),"Typo.. Retype the word",Toast.LENGTH_SHORT).show();
+                        charCount=0;
+                    }
                     //Log.d(TAG,  log);
                 } else if (event.getAction() == KeyEvent.ACTION_UP) {
                     log = (long)(SystemClock.elapsedRealtimeNanos()*NS2MS) + "," + "ACTION_UP," + event.getDisplayLabel();
+
                     //Log.d(TAG, log);
                 }
                 if(kLogger != null && !log.matches("")) {
