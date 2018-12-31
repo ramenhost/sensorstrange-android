@@ -1,6 +1,7 @@
 package io.picopalette.sensorstrange.views;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.SystemClock;
 import android.support.v7.widget.AppCompatTextView;
 import android.text.InputType;
@@ -17,14 +18,19 @@ import android.widget.Toast;
 
 import io.picopalette.sensorstrange.helpers.Logger;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class KeyLogTextView extends AppCompatTextView {
 
 
-    private String[] words={"HELLO","FANTASTIC","CAPTAIN","BATMAN","CYBER","CACHE","WELCOME"};
+    private String[] words={"BATMAN","CYBER","CACHE","WELCOME","CRICKET","PRIZE","ANDROID"};
     private int currentWord=-1;
     private int charCount;
     private int wordCount;
     private static final String TAG = "KeyLog";
+    public static final String FILE_NAME="SharedPrefFile";
+    SharedPreferences sharedPreferences = getContext().getSharedPreferences(FILE_NAME, MODE_PRIVATE);
+    SharedPreferences.Editor editor = sharedPreferences.edit();
     private InputMethodManager imm;
     private static final float NS2MS = 1.0f / 1000000.0f;
     private Logger kLogger;
@@ -47,10 +53,9 @@ public class KeyLogTextView extends AppCompatTextView {
     public void setLogger(Logger logger)
     {
         this.kLogger = logger;
-        charCount=0;
-        wordCount=0;
-        currentWord++;
-
+        charCount = 0;
+        wordCount = 0;
+        currentWord = sharedPreferences.getInt("currentWord",0);
         setText(words[currentWord]);
     } // session starts here
 
@@ -78,7 +83,11 @@ public class KeyLogTextView extends AppCompatTextView {
                                 currentWord++;
                                 if(currentWord==words.length){
                                     setText("Words Completed - Stop Logging");
+                                    editor.putInt("currentWord",0);
+                                    editor.commit();
                                 }else {
+                                    editor.putInt("currentWord",currentWord);
+                                    editor.commit();
                                     setText(words[currentWord]);
                                 }
                             }
