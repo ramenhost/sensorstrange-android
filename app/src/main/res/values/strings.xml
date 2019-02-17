@@ -3,7 +3,19 @@
     <string name="title_home">Key Log</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
-    <string name="start">Start Sensor Logging</string>
-    <string name="stop">Stop Sensor Logging</string>
+    <string name="start">Start Logging</string>
+    <string name="stop">Stop Logging</string>
     <string name="message">Click here to start typing.</string>
+    <string name="explanation">\n
+            Smartphone sensors can leak <b>information, and it can be obtained by any app without permissions</b> in Android
+        and thus invading privacy.\n
+            This is a vulnerability which can be exploited by a <b>side-channel attack</b>.\n
+            Our Final Year Project aims at establishing <b>a proof-of-concept</b> that an information being typed by the user on a smartphone can be
+        illegitimately inferred from the smartphone motion while being typed.\n
+            Kindly help us by providing sample data. We collect Keypresses, Accelerometer and Gyroscope readings while you type in this app. By clicking next, you agree to let us collect Keypresses, Accelerometer and Gyroscope readings (Only while you type in this app).
+    </string>
+    <string name="instructions">Hold your phone in your left hand and tap the keys using your right hand\'s index finger.
+        Prefer an erect sitting posture and remain seated throughout the course of typing. Avoid sudden movements.
+        Type the sentence as shown on screen including periods. The characters you type are not shown on the screen, just keep typing. In case of typo, Continue typing from next character without using backspace. (Only make sure you press the period key at end of each sentence).
+        Thanks in advance !!!!</string>
 </resources>

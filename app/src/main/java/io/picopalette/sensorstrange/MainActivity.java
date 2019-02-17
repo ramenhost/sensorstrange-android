@@ -1,6 +1,7 @@
 package io.picopalette.sensorstrange;
 
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -57,33 +58,35 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mTextMessage = findViewById(R.id.message);
-        mControlButton = findViewById(R.id.controlButton);
-        mSesEditText = findViewById(R.id.sesName);
+        Intent intent = new Intent(MainActivity.this,ExplanationActivity.class);
+        startActivity(intent);
+//        mTextMessage = findViewById(R.id.message);
+//        //mControlButton = findViewById(R.id.controlButton);
+//        mSesEditText = findViewById(R.id.sesName);
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        try {
-            mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-            mAccSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-            mGyroSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-        } catch (NullPointerException e) {
-            Log.d(TAG, e.getMessage());
-        }
-
-        mControlButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(!isSensorLogging) {
-                    startSensorLogging();
-                } else {
-                    stopSensorLogging();
-                }
-            }
-        });
-
-        mTextMessage.setText(getResources().getString(R.string.message));
-        mTextMessage.setVisibility(View.GONE);
+//        try {
+//            mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+//            mAccSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+//            mGyroSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+//        } catch (NullPointerException e) {
+//            Log.d(TAG, e.getMessage());
+//        }
+//
+//        mControlButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if(!isSensorLogging) {
+//                    startSensorLogging();
+//                } else {
+//                    stopSensorLogging();
+//                }
+//            }
+//        });
+//
+//        mTextMessage.setText(getResources().getString(R.string.message));
+//        mTextMessage.setVisibility(View.GONE);
     }
 
     private void startSensorLogging() {
@@ -97,8 +100,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mSensorManager.registerListener(this, mGyroSensor, SensorManager.SENSOR_DELAY_GAME);
 
         String ses = mSesEditText.getText().toString();
-        sLogger = new Logger(ses, Logger.LOG_SENSOR);
-        kLogger = new Logger(ses, Logger.LOG_KEY);
+        sLogger = new Logger(getApplicationContext(), ses, Logger.LOG_SENSOR);
+        kLogger = new Logger(getApplicationContext(), ses, Logger.LOG_KEY);
         mTextMessage.setLogger(kLogger);
         mSesEditText.setEnabled(false);
     }
