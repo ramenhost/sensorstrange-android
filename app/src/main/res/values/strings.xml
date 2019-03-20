@@ -6,16 +6,30 @@
     <string name="start">Start Logging</string>
     <string name="stop">Stop Logging</string>
     <string name="message">Click here to start typing.</string>
-    <string name="explanation">\n
-            Smartphone sensors can leak <b>information, and it can be obtained by any app without permissions</b> in Android
-        and thus invading privacy.\n
-            This is a vulnerability which can be exploited by a <b>side-channel attack</b>.\n
-            Our Final Year Project aims at establishing <b>a proof-of-concept</b> that an information being typed by the user on a smartphone can be
-        illegitimately inferred from the smartphone motion while being typed.\n
-            Kindly help us by providing sample data. We collect Keypresses, Accelerometer and Gyroscope readings while you type in this app. By clicking next, you agree to let us collect Keypresses, Accelerometer and Gyroscope readings (Only while you type in this app).
+    <string name="explanation">
+        <![CDATA[
+        <ul>
+        <li>Smartphone sensors\' values <b>can be obtained by any app without permissions</b> in Android which is a threat to privacy.</li>
+        <li>This is a vulnerability which can be exploited by a <b>side-channel attack</b>.</li>
+        <li>Our Final Year Project aims at establishing <b>a proof-of-concept</b> that an information being typed by a user in a smartphone can be
+        illegitimately inferred from the smartphone motion produced while typing.</li>
+        <li>Kindly help us by providing sample data. We collect Key presses, Accelerometer and Gyroscope readings while you type in this app. By clicking next, <b>you agree to let us collect Key presses, Accelerometer and Gyroscope readings </b>(Only while you type in this app).</li>
+        </ul>
+]]>
     </string>
-    <string name="instructions">Hold your phone in your left hand and tap the keys using your right hand\'s index finger.
-        Prefer an erect sitting posture and remain seated throughout the course of typing. Avoid sudden movements.
-        Type the sentence as shown on screen including periods. The characters you type are not shown on the screen, just keep typing. In case of typo, Continue typing from next character without using backspace. (Only make sure you press the period key at end of each sentence).
-        Thanks in advance !!!!</string>
+    <string name="instructions">
+        <![CDATA[
+        <ul>
+        <li><b>Turn ON</b> your Mobile Data or WiFi</li>
+        <li>Hold your phone in your left hand and tap the keys using your right hand\'s index finger.</li>
+        <li>Prefer an erect sitting posture and <b>remain seated throughout the course of typing</b>. Avoid sudden movements.</li>
+        <li>Type the sentence as shown on screen <b>including period</b>.</li>
+        <li>The characters you type are not shown on the screen, just keep typing. In case of typo, No worries, continue typing from the next character <b>without using backspace</b>. (Make sure you press the period key at end of each sentence).</li>
+        <li>You can even type the sentence at a slow pace inorder to correctly type the given sentence</li>
+        <li>You will be typing a total of 3 sentences, in which the first and second will be the same.</li>
+        <li>After typing the 3 sentences, click <b>Stop logging</b> which will initiate the upload of the files.</li>
+        <li>Thanks in advance</li>
+        </ul>
+]]>
+    </string>
 </resources>

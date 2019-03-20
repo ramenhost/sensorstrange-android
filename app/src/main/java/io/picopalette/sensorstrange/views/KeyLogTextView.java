@@ -27,6 +27,7 @@ public class KeyLogTextView extends AppCompatTextView {
     private InputMethodManager imm;
     private static final float NS2MS = 1.0f / 1000000.0f;
     private Logger kLogger;
+    private int dotCount;
 
     public KeyLogTextView(Context context) {
         super(context);
@@ -49,23 +50,31 @@ public class KeyLogTextView extends AppCompatTextView {
 
     private void setKeyListener() {
         setFocusableInTouchMode(true);
-
+        dotCount = 0;
         setOnKeyListener(new OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-            String log = "";
-            if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+                String log = "";
+                if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+                    return false;
+                } else if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    log = (long) (SystemClock.elapsedRealtimeNanos() * NS2MS) + "," + "ACTION_DOWN," + event.getDisplayLabel();
+                } else if (event.getAction() == KeyEvent.ACTION_UP) {
+                    log = (long) (SystemClock.elapsedRealtimeNanos() * NS2MS) + "," + "ACTION_UP," + event.getDisplayLabel();
+                }
+                if (kLogger != null && !log.matches("")) {
+                    kLogger.appendLog(log);
+                }
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    if (event.getDisplayLabel() == '.') {
+                        dotCount++;
+                        if (dotCount == 1) {
+                            setText("Type your own word/sentence");
+                        } else if (dotCount == 2) {
+                            setText("Click the Stop Logging button");
+                        }
+                    }
+                }
                 return false;
-            }
-            else if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                log = (long)(SystemClock.elapsedRealtimeNanos()*NS2MS) + "," + "ACTION_DOWN," + event.getDisplayLabel();
-            } else if (event.getAction() == KeyEvent.ACTION_UP) {
-                log = (long)(SystemClock.elapsedRealtimeNanos()*NS2MS) + "," + "ACTION_UP," + event.getDisplayLabel();
-            }
-            if(kLogger != null && !log.matches("")) {
-                kLogger.appendLog(log);
-                return true;
-            }
-            return false;
             }
         });
     }
@@ -89,7 +98,7 @@ public class KeyLogTextView extends AppCompatTextView {
     }
 
     public void hideKeyboard() {
-        if(imm != null) {
+        if (imm != null) {
             imm.hideSoftInputFromWindow(getWindowToken(), 0);
         }
     }

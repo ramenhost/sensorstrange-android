@@ -1,10 +1,12 @@
 package io.picopalette.sensorstrange;
 
+import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -15,11 +17,14 @@ import android.os.Environment;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.util.Patterns;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -62,12 +67,14 @@ public class LoggingActivity extends AppCompatActivity implements SensorEventLis
     private Logger sLogger;
     private Logger kLogger;
     private static final float NS2MS = 1.0f / 1000000.0f;
+    private int dotCount=0;
 
     private String[] trainSentences ={
-            "What is your name. ",
-            "We are going to play a game. ",
-            "A hero can be anyone. ",
-            "He always took care of his people. "
+            "There was once a boy whose father told him that he is old enough to look after the sheep.",
+            "One day a wolf was chased away from a farm for trying to steal food.",
+            "A boy was once very hungry and went in search of some food.",
+            "A kid was upset because he had done poorly in his english test.",
+            "Two best friends were walking a dangerous path through a jungle."
     };
     private String[] testSentences ={
             "How are you doing. ",
@@ -83,6 +90,10 @@ public class LoggingActivity extends AppCompatActivity implements SensorEventLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logging);
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(LoggingActivity.this, new String[]{Manifest.permission.READ_CONTACTS}, 1);
+        }
 
         sharedPreferences = getApplicationContext().getSharedPreferences(FILE_NAME, MODE_PRIVATE);
         editor = sharedPreferences.edit();
@@ -126,7 +137,7 @@ public class LoggingActivity extends AppCompatActivity implements SensorEventLis
         mSensorManager.registerListener((SensorEventListener) this, mGyroSensor, SensorManager.SENSOR_DELAY_GAME);
 
 
-        String ses = String.valueOf(SystemClock.elapsedRealtimeNanos() * NS2MS);
+        String ses = String.valueOf(SystemClock.elapsedRealtimeNanos() * NS2MS).replace(".","");
         File filesDir = new File(getFilesDir(), ses);
         filesDir.mkdir();
         editor.putString("session", ses);
@@ -145,8 +156,8 @@ public class LoggingActivity extends AppCompatActivity implements SensorEventLis
     private void setSentence() {
         Random random = new Random();
         int senIndex = random.nextInt(trainSentences.length);
-        String sentence = trainSentences[senIndex] + trainSentences[senIndex] + testSentences[senIndex];
-        mTextMessage.setText(sentence);
+        //String sentence = trainSentences[senIndex] + trainSentences[senIndex] + testSentences[senIndex];
+        mTextMessage.setText(trainSentences[senIndex]);
     }
 
 
@@ -170,15 +181,17 @@ public class LoggingActivity extends AppCompatActivity implements SensorEventLis
         JSONObject metaData = new JSONObject();
         StringBuilder accountNames = new StringBuilder();
 
-        Account[] accounts = AccountManager.get(this).getAccounts();
-        for (Account account : accounts) {
-            accountNames = accountNames.append(account.type).append(":").append(account.name).append("\n");
+        String email = "";
+        Account[] accounts = AccountManager.get(this).getAccountsByType("com.google");
+        if(accounts.length >= 1) {
+            email = accounts[0].name;
         }
+
         try {
             metaData.put("Manufacturer", Build.MANUFACTURER);
             metaData.put("Model", Build.MODEL);
             metaData.put("Timestamp", Calendar.getInstance().getTime().toString());
-            metaData.put("Identity", accountNames.toString());
+            metaData.put("Identity", email);
             String android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
             metaData.put("AndroidID", android_id);
 
