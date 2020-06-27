@@ -36,6 +36,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import net.gotev.uploadservice.MultipartUploadRequest;
+import net.gotev.uploadservice.UploadNotificationConfig;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipParameters;
@@ -208,6 +210,7 @@ public class LoggingActivity extends AppCompatActivity implements SensorEventLis
             e.printStackTrace();
         }
 
+
         try {
             ZipFile zipFile= new ZipFile(new File(getFilesDir(), ses + ".zip"));
             ZipParameters parameters = new ZipParameters();
@@ -224,38 +227,53 @@ public class LoggingActivity extends AppCompatActivity implements SensorEventLis
         String ses = sharedPreferences.getString("session", "NULL");
         File zfile = new File(getFilesDir(), ses + ".zip");
         if(zfile.exists()) {
-            FirebaseStorage storage = FirebaseStorage.getInstance();
+            //FirebaseStorage storage = FirebaseStorage.getInstance();
             //StorageReference storageRef = storage.getReference(ses + ".zip");
-            Uri file = Uri.fromFile(zfile);
-            StorageReference fileRef = storage.getReference(file.getLastPathSegment());
-            UploadTask uploadTask = fileRef.putFile(file);
-            Toast.makeText(getApplicationContext(), "Starting Upload", Toast.LENGTH_LONG).show();
-            editor.putBoolean("uploading", true);
-            editor.commit();
-            mControlButton.setVisibility(View.INVISIBLE);
-        // Register observers to listen for when the download is done or if it fails
-            uploadTask.addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    // Handle unsuccessful uploads
-                    Toast.makeText(getApplicationContext(), "Error Uploading", Toast.LENGTH_LONG).show();
-                    editor.putBoolean("uploading", false);
-                    editor.commit();
-                    mControlButton.setVisibility(View.VISIBLE);
-                }
-            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
-                    // ...
-                    Toast.makeText(getApplicationContext(), "Uploading Successful", Toast.LENGTH_LONG).show();
-                    editor.putBoolean("uploading", false);
-                    editor.commit();
-                    mControlButton.setVisibility(View.VISIBLE);
-                }
-            });
+            //Uri file = Uri.fromFile(zfile);
+//            StorageReference fileRef = storage.getReference(file.getLastPathSegment());
+//            UploadTask uploadTask = fileRef.putFile(file);
+//            Toast.makeText(getApplicationContext(), "Starting Upload", Toast.LENGTH_LONG).show();
+//            editor.putBoolean("uploading", true);
+//            editor.commit();
+//            mControlButton.setVisibility(View.INVISIBLE);
+//            // Register observers to listen for when the download is done or if it fails
+//            uploadTask.addOnFailureListener(new OnFailureListener() {
+//                @Override
+//                public void onFailure(@NonNull Exception exception) {
+//                    // Handle unsuccessful uploads
+//                    Toast.makeText(getApplicationContext(), "Error Uploading", Toast.LENGTH_LONG).show();
+//                    editor.putBoolean("uploading", false);
+//                    editor.commit();
+//                    mControlButton.setVisibility(View.VISIBLE);
+//                }
+//            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//                @Override
+//                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+//                    // ...
+//                    Toast.makeText(getApplicationContext(), "Uploading Successful", Toast.LENGTH_LONG).show();
+//                    editor.putBoolean("uploading", false);
+//                    editor.commit();
+//                    mControlButton.setVisibility(View.VISIBLE);
+//                }
+//            });
+            uploadMultipart(getApplicationContext(), zfile.getAbsolutePath());
         } else {
             Toast.makeText(getApplicationContext(), "Error Uploading", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void uploadMultipart(final Context context, String path) {
+        try {
+            String uploadId =
+                    new MultipartUploadRequest(context, "http://192.168.43.251:8000/upload")
+                            // starting from 3.1+, you can also use content:// URI string instead of absolute file
+                            .addFileToUpload(path, "file")
+                            .setNotificationConfig(new UploadNotificationConfig())
+                            .setMaxRetries(1)
+                            .startUpload();
+        } catch (Exception exc) {
+            Log.e("AndroidUploadService", exc.getMessage(), exc);
         }
     }
 
